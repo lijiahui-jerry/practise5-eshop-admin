@@ -11,14 +11,20 @@ export const reqAddOrUpdateTrademark = (trademark) => {
   if (trademark.id) {
     return request({
       url: '/admin/product/baseTrademark/update',
-      method: 'put',
+      method: 'PUT',
       data: trademark
     })
   } else {
     return request({
       url: '/admin/product/baseTrademark/save',
-      method: 'post',
+      method: 'POST',
       data: trademark
     })
   }
 }
+
+// 删除品牌列表接口
+export const reqTrademarkDelete = (attrId) => request({
+  url: `/admin/product/deleteAttr/${attrId}`,
+  method: 'DELETE'
+})

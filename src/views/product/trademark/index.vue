@@ -3,7 +3,7 @@
     <el-button
       type="primary"
       icon="el-icon-plus"
-      style="margin:10px 0"
+      style="margin:10px 0;"
       @click="showDialog">
       添加品牌
     </el-button>
@@ -30,7 +30,8 @@
         prop="logoUrl"
         label="品牌LOGO"
         width="width">
-        <template slot-scope="scope">
+        <template
+          slot-scope="scope">
           <img
             :src="scope.row.logoUrl"
             :key="scope.$index"
@@ -42,19 +43,21 @@
         prop="prop"
         label="操作"
         width="width">
-        <template slot-scope="scope">
+        <template
+          slot-scope="scope">
           <el-button
             type="warning"
             icon="el-icon-edit"
             size="mini"
-            @click.native="updateOneTrademark(scope.row)">
+            @click="updateOneTrademark(scope.row)">
             修改
           </el-button>
 
           <el-button
             type="danger"
             icon="el-icon-delete"
-            size="mini">
+            size="mini"
+            @click="deleteOneTrademark(scope.row)">
             删除
           </el-button>
         </template>
@@ -110,14 +113,26 @@
               class="avatar"
               v-if="this.trademarkForm.logoUrl"
               :src="this.trademarkForm.logoUrl">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <i
+              v-else
+              class="el-icon-plus avatar-uploader-icon">
+            </i>
           </el-upload>
         </el-form-item>
       </el-form>
 
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible=false">取 消</el-button>
-        <el-button type="primary" @click="handleDialogSubmit">确 定</el-button>
+      <div
+        slot="footer"
+        class="dialog-footer">
+        <el-button
+          @click="dialogFormVisible=false">
+          取 消
+        </el-button>
+        <el-button
+          type="primary"
+          @click="handleDialogSubmit">
+          确 定
+        </el-button>
       </div>
     </el-dialog>
 
@@ -151,6 +166,28 @@ export default ({
           return false
         }
       })
+    },
+    // 删除一个品牌的信息
+    deleteOneTrademark(row) {
+      this.$confirm(`确定要删除[${row.tmName}]吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          let result = await this.$API.trademark.reqTrademarkDelete(row.id)
+
+          if (result.code === 200 || result.code === 20000) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            console.log(this.list )
+            this.getList(this.list.length > 0 ?
+              this.page :
+              this.page - 1 > 0 ? this.page - 1 : 1)
+          }
+        })
     },
     // 修改一个品牌的信息
     updateOneTrademark(row) {
