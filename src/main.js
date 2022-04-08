@@ -17,6 +17,8 @@ import '@/permission' // permission control
 
 import API from '@/api' // 引入暴露的接口请求函数
 
+// 引入全局组件
+import CategorySelect from "@/components/CategorySelect";
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -35,8 +37,15 @@ Vue.use(ElementUI, {locale})
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
 
-// 全局挂载API
+// 全局挂载
 Vue.prototype.$API = API
+Vue.component(CategorySelect.name, CategorySelect)
+
+Vue.directive('focus', {
+  inserted: function (el) {
+    el.querySelector('input').focus();
+  }
+});
 
 Vue.config.productionTip = false
 
