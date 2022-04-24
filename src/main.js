@@ -4,7 +4,7 @@ import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import locale from 'element-ui/lib/locale/lang/en' // lang i18n
+// import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 
 import '@/styles/index.scss' // global css
 
@@ -19,6 +19,7 @@ import API from '@/api' // 引入暴露的接口请求函数
 
 // 引入全局组件
 import CategorySelect from "@/components/CategorySelect";
+import HintButton from '@/components/HintButton'
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -33,13 +34,14 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // set ElementUI lang to EN
-Vue.use(ElementUI, {locale})
+// Vue.use(ElementUI, {locale})
 // 如果想要中文版 element-ui，按如下方式声明
-// Vue.use(ElementUI)
+Vue.use(ElementUI)
 
 // 全局挂载
 Vue.prototype.$API = API
 Vue.component(CategorySelect.name, CategorySelect)
+Vue.component(HintButton.name, HintButton)
 
 Vue.directive('focus', {
   inserted: function (el) {

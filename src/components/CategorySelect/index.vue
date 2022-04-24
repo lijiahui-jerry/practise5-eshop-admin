@@ -9,7 +9,8 @@
         <el-select
           v-model="categoryForm.id1"
           placeholder="请选择"
-          @change="handleChange1()">
+          @change="handleChange1()"
+          :disabled="!able">
           <el-option
             :label="c.name"
             :value="c.id"
@@ -24,7 +25,8 @@
         <el-select
           v-model="categoryForm.id2"
           placeholder="请选择"
-          @change="handleChange2()">
+          @change="handleChange2()"
+          :disabled="!able">
           <el-option
             :label="c.name"
             :value="c.id"
@@ -39,7 +41,8 @@
         <el-select
           v-model="categoryForm.id3"
           placeholder="请选择"
-          @change="handleChange3()">
+          @change="handleChange3()"
+          :disabled="!able">
           <el-option
             :label="c.name"
             :value="c.id"
@@ -72,9 +75,10 @@ export default {
       this.getCategoryList3(id2)
     },
     handleChange3() {
-      const {id1, id2, id3} = this.categoryForm
+      // const {id1, id2, id3} = this.categoryForm
 
-      this.getAttributeList(id1, id2, id3)
+      // this.getAttributeList(id1, id2, id3)
+      this.$emit('getCategoryFormEvent', this.categoryForm)
     },
     async getCategoryList1() {
       let result = await this.$API.attribute.reqCategoryList1()
@@ -97,13 +101,13 @@ export default {
         this.categoryList3 = result.data
       }
     },
-    async getAttributeList(id1, id2, id3) {
-      let result = await this.$API.attribute.reqAttributeList(id1, id2, id3)
-
-      if (result.code === 200 || result.code === 20000) {
-        this.$emit('getAttributeListEvent', result.data)
-      }
-    }
+    // async getAttributeList(id1, id2, id3) {
+    //   let result = await this.$API.attribute.reqAttributeList(id1, id2, id3)
+    //
+    //   if (result.code === 200 || result.code === 20000) {
+    //     this.$emit('getAttributeListEvent', result.data)
+    //   }
+    // }
   },
   data() {
     return {
@@ -118,9 +122,9 @@ export default {
       },
     }
   },
+  props: ['able'],
   mounted() {
     this.getCategoryList1()
-    this.$emit('getCategoryFormEvent', this.categoryForm)
   },
   name: "CategorySelect",
 }

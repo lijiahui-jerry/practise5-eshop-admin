@@ -5,7 +5,8 @@
       <CategorySelect
         ref="componentCategorySelect"
         @getAttributeListEvent="getAttributeListEvent"
-        @getCategoryFormEvent="getCategoryFormEvent">
+        @getCategoryFormEvent="getCategoryFormEvent"
+        :able="this.tableVisible">
       </CategorySelect>
     </el-card>
     <el-card>
@@ -15,7 +16,7 @@
           type="primary"
           icon="el-icon-plus"
           style="margin-bottom: 10px"
-          :disabled="!this.categoryForm.id3"
+          :disabled="!categoryForm.id3"
           @click="attributeAdd()">
           添加属性
         </el-button>
@@ -45,7 +46,7 @@
               <el-tag
                 type="success"
                 style="margin-right: 5px;"
-                v-for="(attrValue) in scope.row.attrValueList"
+                v-for="attrValue in scope.row.attrValueList"
                 :key="attrValue.id">
                 {{ attrValue.valueName }}
               </el-tag>
@@ -149,19 +150,16 @@
             width="150">
             <template
               slot-scope="scope">
-              <!--              <el-button-->
-              <!--                type="warning"-->
-              <!--                icon="el-icon-edit"-->
-              <!--                size="mini"-->
-              <!--                @click="handleEdit(scope.row)">-->
-              <!--              </el-button>-->
-
-              <el-button
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-                @click="handleDelete(scope.row)">
-              </el-button>
+              <el-popconfirm
+                @onConfirm="handleDelete(scope.$index)"
+                :title="`确定删除[${scope.row.valueName}]吗`">
+                <el-button
+                  type="danger"
+                  icon="el-icon-delete"
+                  size="mini"
+                  slot="reference">
+                </el-button>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -170,7 +168,7 @@
           style="margin-top: 20px;"
           type="primary"
           :disabled="!attributeInfo.attrName"
-          @click="attributeValueAddSubmit()">
+          @click="attributeValueUpdate">
           保存
         </el-button>
 
@@ -191,8 +189,21 @@ import cloneDeep from 'lodash/cloneDeep'
 export default ({
   methods: {
     // 确认添加属性
-    attributeValueAddSubmit() {
-      console.log('attrValueSubmit')
+    async attributeValueUpdate() {
+      this.attributeInfo.attrValueList = this.attributeInfo.attrValueList.filter(item => {
+        if (item.valueName.trim() !== '') {
+          delete item.flag
+          return true
+        }
+      })
+
+      try {
+        await this.$API.attribute.reqAttributeNameAdd(this.attributeInfo)
+        this.toggleTableVisible()
+        await this.getAttributeList(this.categoryForm.id1, this.categoryForm.id2, this.categoryForm.id3)
+        this.$message({type: 'success', message: '保存成功'})
+      } catch (e) {
+      }
     },
     // 取消添加属性值
     attributeValueAddCancel() {
@@ -203,8 +214,8 @@ export default ({
       this.attributeInfo.attrValueList.push({
         attrId: this.attributeInfo.id,
         id: undefined,
-        valueName: undefined,
-        // 用于控制属性值显示为input还是div，true为，false为
+        valueName: '',
+        // 用于控制属性值显示为input还是div，true为input，false为div
         flag: true,
       })
     },
@@ -218,9 +229,8 @@ export default ({
       }
       this.toggleTableVisible()
     },
-    handleDelete(row) {
-      this.toggleTableVisible()
-
+    handleDelete(index) {
+      this.attributeInfo.attrValueList.splice(index, 1)
     },
     // 编辑属性
     handleEdit(row) {
@@ -233,10 +243,19 @@ export default ({
     },
     getCategoryFormEvent(categoryForm) {
       this.categoryForm = categoryForm
+      this.getAttributeList(categoryForm.id1, categoryForm.id2, categoryForm.id3)
     },
     toggleTableVisible() {
       this.tableVisible = !this.tableVisible
     },
+    async getAttributeList(id1, id2, id3) {
+      let result = await this.$API.attribute.reqAttributeList(id1, id2, id3)
+
+      if (result.code === 200 || result.code === 20000) {
+        // this.$emit('getAttributeListEvent', result.data)
+        this.getAttributeListEvent(result.data)
+      }
+    }
   },
   data() {
     return {

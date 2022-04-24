@@ -24,7 +24,7 @@ export const reqAttributeList = (category1Id, category2Id, category3Id) => reque
   method: 'GET'
 })
 
-// 添加属性名
+// 添加或删除属性名
 export const reqAttributeNameAdd = (data) => request({
   url: `/admin/product/saveAttrInfo`,
   method: 'POST',
