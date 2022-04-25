@@ -64,7 +64,8 @@
                 type="info"
                 icon="el-icon-info"
                 size="mini"
-                title="查看当前spu的全部sku列表"/>
+                title="查看当前spu的全部sku列表"
+                @click="handleObseve(row)"/>
 
               <el-popconfirm
                 style="margin-left:10px"
@@ -100,8 +101,43 @@
 
       <SKUForm v-show="scene===2" @sceneChange="handleSceneChange" ref="SKUForm"/>
     </el-card>
-  </div>
 
+    <el-dialog
+      :title="`${SPU.spuName}的SKU列表`"
+      :visible.sync="dialogVisible"
+      :before-close="handleClose">
+      <el-table
+        :data="SKUList"
+        style="width: 100%"
+        v-loading="loading"
+        border>
+        <el-table-column
+          prop="skuName"
+          label="名称">
+        </el-table-column>
+
+        <el-table-column
+          prop="price"
+          label="价格"
+          width="150">
+        </el-table-column>
+
+        <el-table-column
+          prop="weight"
+          label="重量"
+          width="100">
+        </el-table-column>
+
+        <el-table-column
+          label="默认图片"
+          width="150">
+          <template slot-scope="{row}">
+            <img :src="row.skuDefaultImg" style="width: 100%;aspect-ratio:1/1">
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -111,6 +147,23 @@ import SPUForm from './spuForm'
 export default ({
   name: "SPU",
   methods: {
+    handleClose(done) {
+      this.loading = true
+      this.SKUList = []
+
+      done()
+    },
+    async handleObseve(row) {
+      this.dialogVisible = true
+      this.SPU = row
+
+      let res = await this.$API.sku.reqSKUById(row.id)
+
+      if (res.code === 200) {
+        this.SKUList = res.data
+        this.loading = false
+      }
+    },
     addSKU(row) {
       this.scene = 2
 
@@ -162,6 +215,12 @@ export default ({
   },
   data() {
     return {
+      loading: true,
+
+      dialogVisible: false,
+      SPU: {},
+      SKUList: [],
+
       categoryForm: {},
 
       dataList: [],
