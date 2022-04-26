@@ -49,14 +49,14 @@
             type="success"
             icon="el-icon-sort-down"
             size="mini"
-            @click="upSale(row)"/>
+            @click="downSale(row)"/>
 
           <el-button
             v-else
             type="success"
             icon="el-icon-sort-up"
             size="mini"
-            @click="downSale(row)"/>
+            @click="upSale(row)"/>
 
           <el-button
             type="primary"
@@ -91,7 +91,7 @@
     <el-pagination
       style="text-align: center;"
       layout="prev, pager, next,jumper,->,sizes,total"
-      :current-page="page"
+      :current-page.sync="page"
       :page-sizes="[3,5,10]"
       :page-size="limit"
       :total="total"
@@ -102,7 +102,8 @@
     <el-drawer
       :visible.sync="drawerShow"
       :show-close="false"
-      size="50%">
+      size="50%"
+      @closed="SKUInfo={}">
       <el-row>
         <el-col :span="5">名称</el-col>
         <el-col :span="16">{{ SKUInfo.skuName }}</el-col>
@@ -131,7 +132,7 @@
         </el-col>
       </el-row>
 
-      <el-row>
+      <el-row v-if="carouselIfShow">
         <el-col :span="5">商品图片</el-col>
         <el-col :span="16">
           <el-carousel height="150px">
@@ -151,17 +152,20 @@ export default ({
   name: "SKU",
   methods: {
     async getSKUInfo(sku) {
-      let res = await this.$API.sku.reqSKUById(sku.id)
+      let res = await this.$API.sku.reqSKUDetailById(sku.id)
 
       if (res.code === 200) {
         this.SKUInfo = res.data
+        this.drawerShow = true
+      } else {
+        this.$message.error('出错！')
       }
     },
     handleEdit() {
       this.$message('正在开发中')
     },
     async downSale(row) {
-      let res = await this.$API.sku.reqCancel(row.id())
+      let res = await this.$API.sku.reqCancel(row.id)
 
       if (res.code === 200) {
         row.isSale = 0
@@ -173,7 +177,7 @@ export default ({
 
       if (res.code === 200) {
         row.isSale = 1
-        this.$message.success('上传成功')
+        this.$message.success('上架成功')
       }
     },
     handleSizeChange(size) {
@@ -190,6 +194,11 @@ export default ({
         this.records = res.data.records
       }
     },
+  },
+  computed: {
+    carouselIfShow() {
+      return this.SKUInfo.skuImageList && this.SKUInfo.skuImageList.length;
+    }
   },
   data() {
     return {

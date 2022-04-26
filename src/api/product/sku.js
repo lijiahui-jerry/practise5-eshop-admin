@@ -26,8 +26,13 @@ export const reqSKUById = (spuId) => request({
   method: 'GET'
 })
 
+export const reqSKUDetailById = (skuId) => request({
+  url: `/admin/product/getSkuById/${skuId}`,
+  method: 'GET'
+})
+
 export const reqSKUList = (page, limit) => request({
-  url: `/admin/product/list/${page}${limit}`,
+  url: `/admin/product/list/${page}/${limit}`,
   method: 'GET'
 })
 
