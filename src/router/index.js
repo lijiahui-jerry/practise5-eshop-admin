@@ -56,7 +56,7 @@ export const constantRoutes = [
   },
 ]
 
-const asyncRoutes = [
+export const asyncRoutes = [
   {
     name: 'Acl',
     path: '/acl',
@@ -159,7 +159,7 @@ const asyncRoutes = [
   },
 ]
 
-const anyRoutes = {
+export const anyRoutes = {
   path: '*',
   redirect: '/404',
   hidden: true
